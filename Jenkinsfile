@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Cloning Git') {
             steps {
-                git branch: 'main' url: 'https://github.com/felipemunozri/react_app.git'
+                git branch: 'main', url: 'https://github.com/felipemunozri/react_app.git'
             }
         }
         stage('Building image') {

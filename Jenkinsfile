@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Clonar el repositorio de GitHub
-                git 'https://github.com/felipemunozri/react_app.git'
+                git branch: 'main', url: 'https://github.com/felipemunozri/react_app.git'
             }
         }
 

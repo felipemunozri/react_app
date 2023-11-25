@@ -1,35 +1,33 @@
 pipeline {
-    environment {
-        registry = "felipemunozri/react_app"
-        registryCredential = 'dockerhub_id'
-        dockerImage = ''
-    }
     agent any
+
     stages {
-        stage('Cloning Git') {
+        stage('Checkout') {
             steps {
+                // Clonar el repositorio de GitHub
                 git 'https://github.com/felipemunozri/react_app.git'
             }
         }
-        stage('Building image') {
-            steps{
+
+        stage('Build and Dockerize') {
+            steps {
+                // Construir la imagen Docker
                 script {
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                    docker.build("react_app:${env.BUILD_ID}")
                 }
             }
         }
-        stage('Deploy image') {
-            steps{
+
+        stage('Push to DockerHub') {
+            steps {
+                // Subir la imagen Docker a DockerHub
                 script {
-                    docker.withRegistry( '', registryCredential ) {
-                        dockerImage.push()
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub_id', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_id') {
+                            docker.image("react_app:${env.BUILD_ID}").push()
+                        }
                     }
                 }
-            }
-        }
-        stage('Cleaning up') {
-            steps{
-                sh "docker rmi $registry:$BUILD_NUMBER"
             }
         }
     }
